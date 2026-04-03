@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     #my apps
     'apps.category',
+    'apps.accounts',
 
     #other apps
     'debug_toolbar',
@@ -75,6 +76,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ecom.wsgi.application'
 
+AUTH_USER_MODEL = 'accounts.Account' #specifies the custom user model to be used for authentication instead of the default User model provided by Django. In this case, it points to the Account model defined in the accounts app.
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -126,6 +128,9 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [ 
     'ecom/static',
 ]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
