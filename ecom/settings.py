@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     #my apps
     'apps.category',
     'apps.accounts',
+    'apps.store',
 
     #other apps
     'debug_toolbar',
@@ -69,6 +70,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.category.context_processors.cat_links',
             ],
         },
     },
