@@ -27,7 +27,7 @@
 				</aside>
 				<main class="col-md-6 border-left">
 
-					<form action="#" method="POST">
+					<form action="{% url 'add-to-cart' single_product.id %}" method="POST">
 						{% csrf_token %}
 						<article class="content-body">
 
@@ -52,6 +52,7 @@
 
 
 							<hr>
+							{% comment %}
 							<div class="row">
 								<div class="item-option-select">
 									<h6>Choose Color</h6>
@@ -74,6 +75,7 @@
 									</select>
 								</div>
 							</div>
+							{% endcomment %}
 							<hr>
 							{% if single_product.stock <= 0 %}
 							<h5 class="text-danger">Out of Stock</h5>

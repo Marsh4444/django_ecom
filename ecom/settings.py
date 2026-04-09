@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'apps.category',
     'apps.accounts',
     'apps.store',
+    'apps.carts',
 
     #other apps
     'debug_toolbar',
