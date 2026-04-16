@@ -3,6 +3,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from apps.carts.models import Cart, CartItem
 from apps.store.models import Product
 
+
+
 # Create your views here.
 def _cart_id(request):
     cart = request.session.session_key
@@ -58,6 +60,8 @@ def remove_cart_item(request, product_id):
 def cart(request, total=0, quantity=0, cart_items=None):
     # Your cart logic here
     try:
+        tax = 0
+        grand_total = 0
         cart = Cart.objects.get(cart_id=_cart_id(request))#this tries to get the cart associated with the current session using the helper function _cart_id
         cart_items = CartItem.objects.filter(cart=cart, is_active=True)#this gets all the active cart items associated with the cart
         for cart_item in cart_items:

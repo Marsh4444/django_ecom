@@ -30,7 +30,7 @@
 				<h6 class="title">Categories</h6>
 			</a>
 		</header>
-		<div class="filter-content collapse show" id="collapse_1" style="">
+		<div class="filter-content collapse show" id="collapse_1" >
 			<div class="card-body">
 
 				<ul class="list-menu">
@@ -49,7 +49,7 @@
 	</aside> <!-- col.// -->
 	<main class="col-md-9">
 
-<header class="border-bottom mb-4 pb-3">
+<header class="border-bottom mb-1 pb-0">
 		<div class="form-inline">
 			<span class="mr-md-auto"><b>{{ product_count }}</b> items found </span>
 
@@ -59,13 +59,13 @@
 <div class="row">
 	{% if products %}
 	{% for product in products %}
-	<div class="col-md-4">
+	<div class="col-md-0">
 		<figure class="card card-product-grid">
-			<div class="img-wrap">
-
-				<a href="{{ product.get_url }}"><img src="{{ product.image.url }}"></a>
-
-			</div> <!-- img-wrap.// -->
+			{% if product.image %}
+				<div class="img-wrap">
+					<a href="{{ product.get_url }}"><img src="{{ product.image.url }}"></a>
+				</div> <!-- img-wrap.// -->
+			{% endif %}
 			<figcaption class="info-wrap">
 				<div class="fix-height">
 					<a href="{{ product.get_url }}" class="title">{{ product.product_name }}</a>
@@ -80,13 +80,13 @@
 	{% endfor %}
 	{% else %}
 	<div>
-		<h2>No result found. Please try again.</h2>
+		<h2 style="text-align: center;">😒 No result found. Please try again.</h2>
 	</div>
 	{% endif %}
 </div> <!-- row end.// -->
 
 
-<nav class="mt-4" aria-label="Page navigation sample">
+<nav class="mt-1" aria-label="Page navigation sample">
 	{% if products.has_other_pages %}
 	  <ul class="pagination">
 			{% if products.has_previous %}

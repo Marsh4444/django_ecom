@@ -74,9 +74,9 @@
                         <a href="{% url 'store-home' %}" class="btn btn-outline-secondary mr-2">Store</a>
  
                         <!-- Search Bar -->
-                        <form action="#" class="flex-grow-1">
+                        <form action="{% url 'search' %}" method="GET" class="flex-grow-1">
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Search">
+                                <input type="text" class="form-control" placeholder="Search" name="keyword" value="{{ keyword }}">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="submit">
                                         <i class="fa fa-search"></i>
@@ -101,10 +101,10 @@
                             </div>
                         </div>
  
-                        <a href="#" class="widget-header">
+                        <a href="{% url 'cart' %}" class="widget-header">
                             <div class="icon-wrap border rounded-circle p-2 position-relative">
                                 <i class="fa fa-shopping-cart fa-lg"></i>
-                                <span class="badge badge-pill badge-danger notify position-absolute" style="top:-5px; right:-5px;">0</span>
+                                <span class="badge badge-pill badge-danger notify position-absolute" style="top:-5px; right:-5px;">{{ cart_count }}</span>
                             </div>
                         </a>
  
