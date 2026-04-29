@@ -153,8 +153,16 @@ MESSAGE_TAGS = {
 }
 
 # SMTP Email configuration (for development, using console backend)
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'devmelo205@gmail.com'
-EMAIL_HOST_PASSWORD = 'hsfmmeiykgkktmqs'
-EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.gmail.com'
+# #EMAIL_PORT = 587
+# EMAIL_PORT = 456
+# EMAIL_HOST_USER = 'devmelo205@gmail.com'
+# EMAIL_HOST_PASSWORD = 'hsfmmeiykgkktmqs'
+# EMAIL_USE_TLS = False
+# EMAIL_USE_SSL = True
+
+# settings.py
+
+# This redirects all emails to your terminal/console
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'devmelo205@gmail.com'
