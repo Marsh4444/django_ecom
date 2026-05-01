@@ -5,6 +5,10 @@ from .forms import RegistrationForm
 from django.contrib import messages , auth
 from django.contrib.auth.decorators import login_required
 
+from apps.carts.models import Cart, CartItem
+from apps.carts.views import _cart_id
+from django.core.exceptions import ObjectDoesNotExist
+
 #verification email imports
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -67,6 +71,16 @@ def login_view(request):
         user = auth.authenticate(request, email=email, password=password)
         # Log the user in if authentication is successful
         if user is not None:
+            try:
+                cart = Cart.objects.get(cart_id=_cart_id(request))#this tries to get the cart associated with the current session using a helper function _cart_id
+                is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()#this checks if there are any cart items associated with the cart
+                if is_cart_item_exists:
+                    cart_items = CartItem.objects.filter(cart=cart)
+                    for item in cart_items:
+                        item.user = user
+                        item.save()#this saves the updated cart items to the database, associating them with the logged-in user
+            except ObjectDoesNotExist:
+                cart = None
             auth.login(request, user)
             messages.success(request, 'You have logged in successfully.')
             return redirect('dashboard') # Redirect to dashboard page after login
@@ -154,7 +168,7 @@ def resetPassword(request):
         if password == confirm_password:
             uid = request.session.get('uid')
             user = Account.objects.get(pk=uid)
-            user.set_password(password)
+            user.set_password(password)#This line sets the user's password to the new password provided by the user. The set_password method is used to securely hash the password before saving it to the database, ensuring that the password is stored in a secure manner. 
             user.save()
             messages.success(request, 'Password reset successful. You can now login with your new password.')
             return redirect('login')

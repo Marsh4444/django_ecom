@@ -2,6 +2,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.carts.models import Cart, CartItem
 from apps.store.models import Product, Variation
+from django.contrib.auth.decorators import login_required
+
+from django.core.exceptions import ObjectDoesNotExist
 
 
 
@@ -104,8 +107,11 @@ def cart(request, total=0, quantity=0, cart_items=None):
     try:
         tax = 0
         grand_total = 0
-        cart = Cart.objects.get(cart_id=_cart_id(request))#this tries to get the cart associated with the current session using the helper function _cart_id
-        cart_items = CartItem.objects.filter(cart=cart, is_active=True)#this gets all the active cart items associated with the cart
+        if request.user.is_authenticated:#this checks if the user is authenticated, which means they are logged in to their account
+            cart_items = CartItem.objects.filter(user=request.user, is_active=True)#if the user is authenticated, it gets all the active cart items associated with the user    
+        else:#if the user is not authenticated, it gets the cart items associated with the current session's cart
+            cart = Cart.objects.get(cart_id=_cart_id(request))#this tries to get the cart associated with the current session using the helper function _cart_id
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)#this gets all the active cart items associated with the cart
         for cart_item in cart_items:
             total += (cart_item.product.price * cart_item.quantity)#this calculates the total price of the cart by multiplying the price of each product by its quantity and adding it to the total 
             quantity += cart_item.quantity#this calculates the total quantity of items in the cart by adding the quantity of each cart item to the total quantity
@@ -125,3 +131,31 @@ def cart(request, total=0, quantity=0, cart_items=None):
     }
     
     return render(request, 'carts/cart.html', context)
+
+@login_required(login_url='login')
+def checkout(request, total=0, quantity=0, cart_items=None):
+    # Your checkout logic here
+    try:
+        tax = 0
+        grand_total = 0
+        cart = Cart.objects.get(cart_id=_cart_id(request))#this tries to get the cart associated with the current session using the helper function _cart_id
+        cart_items = CartItem.objects.filter(cart=cart, is_active=True)#this gets all the active cart items associated with the cart
+        for cart_item in cart_items:
+            total += (cart_item.product.price * cart_item.quantity)#this calculates the total price of the cart by multiplying the price of each product by its quantity and adding it to the total 
+            quantity += cart_item.quantity#this calculates the total quantity of items in the cart by adding the quantity of each cart item to the total quantity
+        tax = (2 * total) / 100#this calculates the tax as 2% of the total price
+        grand_total = total + tax#this calculates the grand total by adding the tax to the total
+
+
+    except Cart.DoesNotExist:
+        pass# if the cart does not exist, it simply passes and does not return any cart items
+    
+    context = {
+        'total': total,
+        'quantity': quantity,
+        'cart_items': cart_items,
+        'tax': tax,
+        'grand_total': grand_total,
+    }
+    
+    return render(request, 'carts/checkout.html', context)
