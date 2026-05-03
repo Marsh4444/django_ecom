@@ -76,9 +76,38 @@ def login_view(request):
                 is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()#this checks if there are any cart items associated with the cart
                 if is_cart_item_exists:
                     cart_items = CartItem.objects.filter(cart=cart)
+
+#this block of code is responsible for handling the cart items when a user logs in. It checks if there are any cart items associated with the current session's cart and retrieves their variations. The variations are stored in a list called product_variation, which is then compared with the existing variations of the cart items associated with the logged-in user. If a match is found, the quantity of the existing cart item is updated; otherwise, the cart items from the session are associated with the logged-in user and saved to the database.
+                   #this initializes an empty list called product_variation to store the variations of the cart items. It then iterates through each cart item and retrieves its variations using the variations.all() method, appending them to the product_variation list. 
+                    product_variation = []
                     for item in cart_items:
-                        item.user = user
-                        item.save()#this saves the updated cart items to the database, associating them with the logged-in user
+                        variation = item.variations.all()
+                        product_variation.append(list(variation))
+
+#this code retrieves the cart items associated with the cart and iterates through them to extract the variations of each item. The variations are stored in a list called product_variation.
+                    cart_item = CartItem.objects.filter(user=user)
+                    existing_variation_list = []
+                    id = []
+                    for item in cart_item:
+                        existing_variation = item.variations.all()
+                        existing_variation_list.append(list(existing_variation))
+                        id.append(item.id)
+
+#this code retrieves the cart items associated with the logged-in user and iterates through them to extract their variations. The variations are stored in a list called existing_variation_list, and the corresponding item IDs are stored in a separate list called id.
+                    for pr in product_variation:
+                        if pr in existing_variation_list:
+                            index = existing_variation_list.index(pr)
+                            item_id = id[index]
+                            item = CartItem.objects.get(id=item_id)
+                            item.quantity += 1
+                            item.user = user
+                            item.save()
+                        else:
+                            cart_items = CartItem.objects.filter(cart=cart)
+                            for item in cart_items:
+                                item.user = user
+                                item.save()#this saves the updated cart items to the database, associating them with the logged-in user
+            
             except ObjectDoesNotExist:
                 cart = None
             auth.login(request, user)
