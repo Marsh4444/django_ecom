@@ -17,6 +17,8 @@ from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 
+import requests
+
 
 # Create your views here.
 def register(request):
@@ -112,7 +114,14 @@ def login_view(request):
                 cart = None
             auth.login(request, user)
             messages.success(request, 'You have logged in successfully.')
-            return redirect('dashboard') # Redirect to dashboard page after login
+            url = request.META.get('HTTP_REFERER')#this retrieves the URL of the page that referred the user to the login page, which is typically the page they were on before being redirected to login.
+            try:
+                query = requests.utils.urlparse(url).query#this parses the URL and retrieves the query parameters from it, which can be used to determine where to redirect the user after login.
+                params = dict(x.split('=') for x in query.split('&'))#this splits the query string into individual parameters and creates a dictionary of key-value pairs from them.
+                if 'next' in params:
+                    return redirect(params['next'])#this checks if there is a 'next' parameter in the query string, which indicates the page the user was trying to access before being redirected to login. If it exists, the user is redirected to that page after successful login.
+            except:
+                return redirect('dashboard') # Redirect to dashboard page after login
         else:
             messages.error(request, 'Invalid email or password.')
             return redirect('login') # Redirect back to login page on failure   

@@ -135,12 +135,15 @@ def add_to_cart(request, product_id):
 
 def remove_from_cart(request, product_id, cart_item_id):
 
-    cart = Cart.objects.get(cart_id=_cart_id(request))#this gets the cart associated with the current session using the helper function _cart_id
     product = get_object_or_404(Product, id=product_id)#this gets the product from the database using the provided product_id, and if it does not exist, it returns a 404 error
     # get the exact cart item using its unique id
     # this avoids the "MultipleObjectsReturned" error
     try:
-        cart_item = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)#this tries to get the specific cart item that matches the product, cart, and cart_item_id from the database
+        if request.user.is_authenticated:#this checks if the user is authenticated, which means they are logged in to their account
+            cart_item = CartItem.objects.get(product=product, user=request.user, id=cart_item_id)#this tries to get the specific cart item that matches the product, user, and cart_item_id from the database
+        else:
+            cart = Cart.objects.get(cart_id=_cart_id(request))#this gets the cart associated with the current session using the helper function _cart_id
+            cart_item = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)#this tries to get the specific cart item that matches the product, cart, and cart_item_id from the database
         # check if quantity is more than 1
         if cart_item.quantity > 1:
             # reduce quantity by 1
@@ -156,11 +159,14 @@ def remove_from_cart(request, product_id, cart_item_id):
     return redirect('cart')
 
 def remove_cart_item(request, product_id, cart_item_id):
-    cart = Cart.objects.get(cart_id=_cart_id(request))#this gets the cart associated with the current session using the helper function _cart_id
     product = get_object_or_404(Product, id=product_id)#this gets the product from the database using the provided product_id, and if it does not exist, it returns a 404 error
     # get the exact cart item using its unique id
     try:
-        cart_item = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)
+        if request.user.is_authenticated:#this checks if the user is authenticated, which means they are logged in to their account
+            cart_item = CartItem.objects.get(product=product, user=request.user, id=cart_item_id)#this tries to get the specific cart item that matches the product, user, and cart_item_id from the database   
+        else:
+            cart = Cart.objects.get(cart_id=_cart_id(request))#this gets the cart associated with the current session using the helper function _cart_id
+            cart_item = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)
         # delete the item completely from the cart
         cart_item.delete()
 
@@ -207,8 +213,11 @@ def checkout(request, total=0, quantity=0, cart_items=None):
     try:
         tax = 0
         grand_total = 0
-        cart = Cart.objects.get(cart_id=_cart_id(request))#this tries to get the cart associated with the current session using the helper function _cart_id
-        cart_items = CartItem.objects.filter(cart=cart, is_active=True)#this gets all the active cart items associated with the cart
+        if request.user.is_authenticated:#this checks if the user is authenticated, which means they are logged in to their account
+            cart_items = CartItem.objects.filter(user=request.user, is_active=True)#if the user is authenticated, it gets all the active cart items associated with the user    
+        else:#if the user is not authenticated, it gets the cart items associated with the current session's cart
+            cart = Cart.objects.get(cart_id=_cart_id(request))#this tries to get the cart associated with the current session using the helper function _cart_id
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)#this gets all the active cart items associated with the cart
         for cart_item in cart_items:
             total += (cart_item.product.price * cart_item.quantity)#this calculates the total price of the cart by multiplying the price of each product by its quantity and adding it to the total 
             quantity += cart_item.quantity#this calculates the total quantity of items in the cart by adding the quantity of each cart item to the total quantity
