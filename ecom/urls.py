@@ -28,6 +28,9 @@ urlpatterns = [
     path('carts/', include('apps.carts.urls')),
     path('accounts/', include('apps.accounts.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
+
+    #orders urls
+    path('orders/', include('apps.orders.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
