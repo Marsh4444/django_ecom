@@ -6,6 +6,11 @@ from apps.carts.models import CartItem
 from .forms import OrderForm
 
 # Create your views here.
+def payments(request):
+    """View to handle payment processing."""
+    return render(request, 'orders/payment.html')
+
+
 def place_order(request, total=0, quantity=0):
     """View to place an order based on the items in the cart."""
 
